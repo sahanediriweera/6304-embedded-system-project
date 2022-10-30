@@ -1,3 +1,4 @@
+#include <LiquidCrystal.h>
 String data="";
 int mark = 0;
 boolean Mark_Start=false;
@@ -11,12 +12,17 @@ double prelatt = -1.0;
 double nowlong = -1.0;
 double nowlatt = -1.0;
 double total_distance = 0.0;
+int x =0;
+LiquidCrystal lcd(13,8,9,10,11,12);
 
 void setup(){
   Serial.begin(9600);
   Serial1.begin(9600);
   Serial.println(0);
   delay(1000);
+  lcd.begin(16, 2);
+   
+  lcd.print("Hello, World!");
 }
 
 void loop(){
@@ -141,6 +147,12 @@ void loop(){
         Serial.println(dist_calc);        
         Serial.print("total distance   ");              
         Serial.println(total_distance);
+        lcd.setCursor(0, 1);
+  // print the number of seconds since reset:
+
+        lcd.setCursor(0,1);
+
+        lcd.print(dist_calc);        
                              
       /*
       Serial.print("GPStatus:");
