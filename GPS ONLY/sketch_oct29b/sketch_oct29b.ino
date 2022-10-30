@@ -1,131 +1,120 @@
-/*
- * Rui Santos 
- * Complete Project Details https://randomnerdtutorials.com
- *
- * Based on the example TinyGPS++ from arduiniana.org
- *
- */
- 
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
 
-static const int RXPin = 4, TXPin = 3;
-static const uint32_t GPSBaud = 9600;
+const int RXPin = 3, TXPin = 4;
+const uint32_t GPSBaud = 9600; //Default baud of NEO-6M is 9600
 
-// The TinyGPS++ object
-TinyGPSPlus gps;
 
-// The serial connection to the GPS device
-SoftwareSerial ss(RXPin, TXPin);
+TinyGPSPlus gps; // the TinyGPS++ object
+SoftwareSerial gpsSerial(RXPin, TXPin); // the serial interface to the GPS device
 
-void setup(){
+bool initialized_coordinates = 0;
+double prelong = -1.0;
+double prelatt = -1.0;
+double nowlong = -1.0;
+double nowlatt = -1.0;
+double total_distance = 0.0;
+
+void setup() {
   Serial.begin(9600);
-  ss.begin(GPSBaud);
+  gpsSerial.begin(GPSBaud);
+
+  Serial.println(F("Arduino - GPS module"));
 }
 
-void loop(){
-  // This sketch displays information every time a new sentence is correctly encoded.
-  while (ss.available() > 0){
-    gps.encode(ss.read());
-    if (gps.location.isUpdated()){
-      // Latitude in degrees (double)
-      Serial.print("Latitude= "); 
-      Serial.print(gps.location.lat(), 12);      
-      // Longitude in degrees (double)
-      Serial.print(" Longitude= "); 
-      Serial.println(gps.location.lng(), 12); 
-       
-      // Raw latitude in whole degrees
-      Serial.print("Raw latitude = "); 
-      Serial.print(gps.location.rawLat().negative ? "-" : "+");
-      Serial.println(gps.location.rawLat().deg); 
-      // ... and billionths (u16/u32)
-      Serial.println(gps.location.rawLat().billionths);
-      
-      // Raw longitude in whole degrees
-      Serial.print("Raw longitude = "); 
-      Serial.print(gps.location.rawLng().negative ? "-" : "+");
-      Serial.println(gps.location.rawLng().deg); 
-      // ... and billionths (u16/u32)
-      Serial.println(gps.location.rawLng().billionths);
+void loop() {
+  if (gpsSerial.available() > 0) {
+    if (gps.encode(gpsSerial.read())) {
+      if (gps.location.isValid()) {
+        Serial.print(F("- latitude: "));
+        Serial.println(gps.location.lat());
 
-      // Raw date in DDMMYY format (u32)
-      Serial.print("Raw date DDMMYY = ");
-      Serial.println(gps.date.value()); 
+        Serial.print(F("- longitude: "));
+        Serial.println(gps.location.lng());
+                
+        if(!initialized_coordinates){
+          if (prelong == -1.0 && prelatt == -1.0 )
+          {
+            prelong = gps.location.lng();
+            prelatt = gps.location.lat();
+            initialized_coordinates = true;
+            delay(1000);
+          }
+        }
+        nowlong = gps.location.lng();
+        nowlatt = gps.location.lat();
+        float flat1 = prelatt;
+        float flon1 = prelong;
+        float dist_calc = 0;
+        float dist_calc2 = 0;
+        float dist_calcKM = 0;
+        float diflat = 0;
+        float diflon = 0;
+        float x2lat = nowlatt;
+        float x2lon = nowlong;
+  
+        diflat = radians(x2lat - flat1);
+        flat1 = radians(flat1);
+        x2lat = radians(x2lat);
+        diflon = radians((x2lon) - (flon1));
+        dist_calc = (sin(diflat / 2.0) * sin(diflat / 2.0));
+        dist_calc2 = cos(flat1);
+        dist_calc2 *= cos(x2lat);
+        dist_calc2 *= sin(diflon / 2.0);
+        dist_calc2 *= sin(diflon / 2.0);
+        dist_calc += dist_calc2;
+        dist_calc = (2 * atan2(sqrt(dist_calc), sqrt(1.0 - dist_calc)));
+        dist_calc *= 6371000.0;
+        dist_calcKM = dist_calc / 1000;
+        if(dist_calc>10.0){
+        total_distance += dist_calc;
+        prelong = nowlong;
+        prelatt = nowlatt;
+        }
+        Serial.print("Total Distance : ");
+        Serial.print(total_distance);
+        Serial.println();
 
-      // Year (2000+) (u16)
-      Serial.print("Year = "); 
-      Serial.println(gps.date.year()); 
-      // Month (1-12) (u8)
-      Serial.print("Month = "); 
-      Serial.println(gps.date.month()); 
-      // Day (1-31) (u8)
-      Serial.print("Day = "); 
-      Serial.println(gps.date.day()); 
+        
 
-      // Raw time in HHMMSSCC format (u32)
-      Serial.print("Raw time in HHMMSSCC = "); 
-      Serial.println(gps.time.value()); 
+        Serial.print(F("- altitude: "));
+        if (gps.altitude.isValid())
+          Serial.println(gps.altitude.meters());
+        else
+          Serial.println(F("INVALID"));
+      } else {
+        Serial.println(F("- location: INVALID"));
+      }
 
-      // Hour (0-23) (u8)
-      Serial.print("Hour = "); 
-      Serial.println(gps.time.hour()); 
-      // Minute (0-59) (u8)
-      Serial.print("Minute = "); 
-      Serial.println(gps.time.minute()); 
-      // Second (0-59) (u8)
-      Serial.print("Second = "); 
-      Serial.println(gps.time.second()); 
-      // 100ths of a second (0-99) (u8)
-      Serial.print("Centisecond = "); 
-      Serial.println(gps.time.centisecond()); 
+      Serial.print(F("- speed: "));
+      if (gps.speed.isValid()) {
+        Serial.print(gps.speed.kmph());
+        Serial.println(F(" km/h"));
+      } else {
+        Serial.println(F("INVALID"));
+      }
 
-      // Raw speed in 100ths of a knot (i32)
-      Serial.print("Raw speed in 100ths/knot = ");
-      Serial.println(gps.speed.value()); 
-      // Speed in knots (double)
-      Serial.print("Speed in knots/h = ");
-      Serial.println(gps.speed.knots()); 
-      // Speed in miles per hour (double)
-      Serial.print("Speed in miles/h = ");
-      Serial.println(gps.speed.mph()); 
-      // Speed in meters per second (double)
-      Serial.print("Speed in m/s = ");
-      Serial.println(gps.speed.mps()); 
-      // Speed in kilometers per hour (double)
-      Serial.print("Speed in km/h = "); 
-      Serial.println(gps.speed.kmph()); 
+      Serial.print(F("- GPS date&time: "));
+      if (gps.date.isValid() && gps.time.isValid()) {
+        Serial.print(gps.date.year());
+        Serial.print(F("-"));
+        Serial.print(gps.date.month());
+        Serial.print(F("-"));
+        Serial.print(gps.date.day());
+        Serial.print(F(" "));
+        Serial.print(gps.time.hour());
+        Serial.print(F(":"));
+        Serial.print(gps.time.minute());
+        Serial.print(F(":"));
+        Serial.println(gps.time.second());
+      } else {
+        Serial.println(F("INVALID"));
+      }
 
-      // Raw course in 100ths of a degree (i32)
-      Serial.print("Raw course in degrees = "); 
-      Serial.println(gps.course.value()); 
-      // Course in degrees (double)
-      Serial.print("Course in degrees = "); 
-      Serial.println(gps.course.deg()); 
-
-      // Raw altitude in centimeters (i32)
-      Serial.print("Raw altitude in centimeters = "); 
-      Serial.println(gps.altitude.value()); 
-      // Altitude in meters (double)
-      Serial.print("Altitude in meters = "); 
-      Serial.println(gps.altitude.meters()); 
-      // Altitude in miles (double)
-      Serial.print("Altitude in miles = "); 
-      Serial.println(gps.altitude.miles()); 
-      // Altitude in kilometers (double)
-      Serial.print("Altitude in kilometers = "); 
-      Serial.println(gps.altitude.kilometers()); 
-      // Altitude in feet (double)
-      Serial.print("Altitude in feet = "); 
-      Serial.println(gps.altitude.feet()); 
-
-      // Number of satellites in use (u32)
-      Serial.print("Number os satellites in use = "); 
-      Serial.println(gps.satellites.value()); 
-
-      // Horizontal Dim. of Precision (100ths-i32)
-      Serial.print("HDOP = "); 
-      Serial.println(gps.hdop.value()); 
+      Serial.println();
     }
   }
+
+  if (millis() > 5000 && gps.charsProcessed() < 10)
+    Serial.println(F("No GPS data received: check wiring"));
 }
