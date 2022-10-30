@@ -16,9 +16,8 @@ double nowlatt = -1.0;
 double total_distance = 0.0;
 
 #include <LiquidCrystal.h>
-
 LiquidCrystal lcd(1,2,5,6,7,8);
-//LiquidCrystal lcd(13,8,9,10,11,12);
+//LiquidCrystal lcd(7,8,9,10,11,12);
 /*
 13-8
 12-7
