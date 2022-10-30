@@ -15,11 +15,44 @@ double nowlong = -1.0;
 double nowlatt = -1.0;
 double total_distance = 0.0;
 
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(1,2,5,6,7,8);
+//LiquidCrystal lcd(13,8,9,10,11,12);
+/*
+13-8
+12-7
+11-6
+10-5
+9-2
+8-1
+*/
+
+/*
+K - Ground
+A - 5V
+D7 - 12
+D6 - 11
+D5 - 10
+D4 - 9
+E  - 8
+RW - Ground
+RS - 7
+VO - POT
+VDD - 5V
+VSS - Ground 
+*/
+int x= 0;
+
 void setup() {
   Serial.begin(9600);
   gpsSerial.begin(GPSBaud);
 
   Serial.println(F("Arduino - GPS module"));
+
+  lcd.begin(16, 2);
+   
+  lcd.print("Hello, World!");
 }
 
 void loop() {
@@ -74,9 +107,14 @@ void loop() {
         Serial.print("Total Distance : ");
         Serial.print(total_distance);
         Serial.println();
+        lcd.setCursor(0, 1);
+  // print the number of seconds since reset:
 
-        
+        lcd.print(millis() / 1000);
 
+        lcd.setCursor(0,0);
+
+        lcd.print(x++);
         Serial.print(F("- altitude: "));
         if (gps.altitude.isValid())
           Serial.println(gps.altitude.meters());
