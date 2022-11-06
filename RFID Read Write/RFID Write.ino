@@ -18,7 +18,7 @@ int blockNum = 2;
 int rem=0;
 /* Create an array of 16 Bytes and fill it with data */
 /* This is the actual data which is going to be written into the card */
-byte blockData [16] = {"1111111110111111"};// Empty Card Status
+byte blockData [16] = {"1111111111111111"};// Empty Card Status
 
 /* Create another array to read data from Block */
 /* Legthn of buffer should be 2 Bytes more than the size of Block (16 Bytes) */
@@ -90,26 +90,27 @@ void loop()
             }
    }
 
- if(rem==15){
+ if(rem==16){
+  Serial.print("\n");
   Serial.print("This is an empty card!");
   Serial.print("\n");     
   Serial.println("Writing to Data Block...");
   byte blockData [16] = {"0000000000000000"};
-  WriteDataToBlock(blockNum, blockData); 
- }  
+  WriteDataToBlock(blockNum, blockData); }
  
-   /* Read data from the same block */
-   Serial.print("\n");
-   Serial.println("Reading from Data Block...");
-   ReadDataFromBlock(blockNum, readBlockData);
+ 
+ /* Read data from the same block */
+ Serial.print("\n");
+ Serial.println("Reading from Data Block...");
+ ReadDataFromBlock(blockNum, readBlockData);
    /* If you want to print the full memory dump, uncomment the next line */
    //mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
    
    /* Print the data read from block */
-   Serial.print("\n");
-   Serial.print("Data in Block:");
-   Serial.print(blockNum);
-   Serial.print(" --> ");
+ Serial.print("\n");
+ Serial.print("Data in Block:");
+ Serial.print(blockNum);
+ Serial.print(" --> ");
    for (int j=0 ; j<16 ; j++)
    {
      Serial.write(readBlockData[j]);
