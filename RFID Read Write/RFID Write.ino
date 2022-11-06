@@ -95,7 +95,7 @@ void loop()
   Serial.print("This is an empty card!");
   Serial.print("\n");     
   Serial.println("Writing to Data Block...");
-  byte blockData [16] = {"0000000000000000"};
+  byte blockData [16] = {"1111111111111111"};
   WriteDataToBlock(blockNum, blockData); }
  
  
