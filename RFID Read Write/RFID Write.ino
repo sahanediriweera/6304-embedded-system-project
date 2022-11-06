@@ -14,10 +14,11 @@ MFRC522::MIFARE_Key key;
 
 /* Set the block to which we want to write data */
 /* Be aware of Sector Trailer Blocks */
-int blockNum = 2;  
+int blockNum = 2;
+int rem=0;
 /* Create an array of 16 Bytes and fill it with data */
 /* This is the actual data which is going to be written into the card */
-byte blockData [16] = {"0000000000000000"};
+byte blockData [16] = {"1111111110111111"};// Empty Card Status
 
 /* Create another array to read data from Block */
 /* Legthn of buffer should be 2 Bytes more than the size of Block (16 Bytes) */
@@ -35,6 +36,7 @@ void setup()
   /* Initialize MFRC522 Module */
   mfrc522.PCD_Init();
   Serial.println("Scan a MIFARE 1K Tag to write data...");
+  
 }
 
 void loop()
@@ -73,10 +75,29 @@ void loop()
   Serial.println(mfrc522.PICC_GetTypeName(piccType));
          
    /* Call 'WriteDataToBlock' function, which will write data to the block */
-   Serial.print("\n");
-   Serial.println("Writing to Data Block...");
-   WriteDataToBlock(blockNum, blockData);
-   
+  ReadDataFromBlock(blockNum, readBlockData);
+   for (int j=0 ; j<16 ; j++)
+   {
+     if(Serial.write(readBlockData[j])==1){
+        rem= rem+1;
+             
+       //Serial.print("\n");
+       //Serial.println("Writing to Data Block...");
+       //WriteDataToBlock(blockNum, blockData);       
+     } 
+     else{
+       return rem ;      
+            }
+   }
+
+ if(rem==15){
+  Serial.print("This is an empty card!");
+  Serial.print("\n");     
+  Serial.println("Writing to Data Block...");
+  byte blockData [16] = {"0000000000000000"};
+  WriteDataToBlock(blockNum, blockData); 
+ }  
+ 
    /* Read data from the same block */
    Serial.print("\n");
    Serial.println("Reading from Data Block...");
@@ -91,16 +112,18 @@ void loop()
    Serial.print(" --> ");
    for (int j=0 ; j<16 ; j++)
    {
-     
      Serial.write(readBlockData[j]);
-   }
+     
+        
+    
    
-   Serial.print("\n");
+  }
+  Serial.print("\n");
 }
 
 
 
-void WriteDataToBlock(int blockNum, byte blockData[]) 
+void WriteDataToBlock(int blockNum, byte blockData[])
 {
   /* Authenticating the desired data block for write access using Key A */
   status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
@@ -131,9 +154,8 @@ void WriteDataToBlock(int blockNum, byte blockData[])
   
 }
 
-void ReadDataFromBlock(int blockNum, byte readBlockData[]) 
+void ReadDataFromBlock(int blockNum, byte readBlockData[])
 {
-  /* Authenticating the desired data block for Read access using Key A */
   byte status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, blockNum, &key, &(mfrc522.uid));
 
   if (status != MFRC522::STATUS_OK)
