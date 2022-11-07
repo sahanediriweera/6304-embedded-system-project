@@ -33,7 +33,7 @@ double prelatt = -1.0;
 double nowlong = -1.0;
 double nowlatt = -1.0;
 double total_distance = 0.0;
-LiquidCrystal lcd(13,8,9,10,11,12);
+LiquidCrystal lcd(2,5,10,11,12,13);
 void setup() 
 {
   Serial.begin(9600);
@@ -271,7 +271,7 @@ bool checkEmpty(){
 void initCardIDs(){
   for(int i = 0;i<100;i++){
     cardIDs[i] = 0;
-    distances = 0.0;
+    distances[i] = 0.0;
   }
 }
 
