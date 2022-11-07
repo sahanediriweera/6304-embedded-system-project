@@ -181,13 +181,13 @@ void loop()
         ReadDataFromBlock(blockNum, readBlockData);
         
         if(checkEmpty()){
-          lcd.print("Empty Card Detected");
           bool exist = true;
           int num;
           while (exist)
           {
             num = generateRandomNumber();
             exist = checKExist(num);
+            Serial.print("nkn");
           }
           cardIDs[++passengercount] = num;
           passengerdistances[passengercount] = total_distance;
@@ -209,6 +209,7 @@ void loop()
       Mark_Start=true;
     }
   }
+    lcd.clear();  
 }
 
 
@@ -253,7 +254,8 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
   else
   {
     Serial.println("Authentication success");
-    lcd.print("Success");    
+    lcd.print("Success");
+    delay(500);    
   }
 
   status = mfrc522.MIFARE_Read(blockNum, readBlockData, &bufferLen);
@@ -277,10 +279,9 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
 bool checkEmpty(){
 
   bool present = true;
-    turnintobyte(cardIDs[i]);
     if ((bytearray[8]== readBlockData[8]) && (bytearray[9]== readBlockData[9]) && (bytearray[10]== readBlockData[10]) && (bytearray[11]== readBlockData[11]))
     {
-      present = true;
+      present = false;
     }    
   return present;    
   }
@@ -338,6 +339,7 @@ void takeCardtype(){
   }
   if ( ! mfrc522.PICC_ReadCardSerial()) 
   {
+    
     return;
   }
   MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
