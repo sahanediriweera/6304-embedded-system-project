@@ -158,7 +158,7 @@ void loop()
         total_distance += dist_calc;
         prelong = nowlong;
         prelatt = nowlatt;
-        }
+        }        
         Serial.print("Now Distance   ");        
         Serial.println(dist_calc);        
         Serial.print("total distance   ");              
@@ -209,13 +209,17 @@ void loop()
             lcd.print("Writing data values");
         }
         else{
+          setPosition();                      
+          if(tempIdPosition>-1){
           lcd.print("Used Card Detected");
           float distance_travelled = total_distance - passengerdistances[tempIdPosition];
           float price = distance_travelled*cost;
           WriteDataToBlock(blockNum,blockData);
           lcd.print("Price ");
           Serial.println(price);
-          lcd.print(price);       
+          lcd.print(price);}
+          else{
+lcd.print("Error");                      }       
           }
         }
         
@@ -357,7 +361,6 @@ bool checKExist(int){
     if ((bytearray[0]== readBlockData[0]) && (bytearray[1]== readBlockData[1]) && (bytearray[2]== readBlockData[2]) && (bytearray[3]== readBlockData[3]))
     {
       present = true;
-      tempIdPosition = i;
     }
     
   }
@@ -369,4 +372,16 @@ bool checKExist(int){
   bytearray[1] = (value >> 16) & 0xFF;
   bytearray[2] = (value >> 8) & 0xFF;
   bytearray[3] = (value >> 0) & 0xFF;
+}
+
+void setPosition(){
+  tempIdPosition = -1;
+    for (int i = 0; i < passengercount; i++)
+    {
+    turnintobyte(cardIDs[i]);
+    if ((bytearray[0]== readBlockData[0]) && (bytearray[1]== readBlockData[1]) && (bytearray[2]== readBlockData[2]) && (bytearray[3]== readBlockData[3]))
+    {
+      tempIdPosition = i;
+    }
+  }             
 }
