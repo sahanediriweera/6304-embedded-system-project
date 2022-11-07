@@ -181,6 +181,7 @@ void loop()
         ReadDataFromBlock(blockNum, readBlockData);
         
         if(checkEmpty()){
+          lcd.print("Empty Card Detected");
           bool exist = true;
           int num;
           while (exist)
@@ -191,12 +192,16 @@ void loop()
           cardIDs[++passengercount] = num;
           passengerdistances[passengercount] = total_distance;
           WriteDataToBlock(blockNum,bytearray);
+          lcd.print("Writing data values");
         }
         else{
+          lcd.print("Used Card Detected");
           float distance_travelled = total_distance - passengerdistances[tempIdPosition];
           float price = distance_travelled*cost;
           WriteDataToBlock(blockNum,blockData);
-          Serial.println(price);       
+          lcd.print("Price ");
+          Serial.println(price);
+          lcd.print(price);       
         }
         
     }
