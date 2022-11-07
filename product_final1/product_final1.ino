@@ -148,7 +148,7 @@ void loop()
         dist_calc = (2 * atan2(sqrt(dist_calc), sqrt(1.0 - dist_calc)));
         dist_calc *= 6371000.0;
         dist_calcKM = dist_calc / 1000;
-        if(dist_calc>100.0 && dist_calc <500){
+        if(dist_calc>100.0 && dist_calc <500.0){
         total_distance += dist_calc;
         prelong = nowlong;
         prelatt = nowlatt;
@@ -175,10 +175,13 @@ void loop()
           }
           cardIDs[++passengercount] = num;
           passengerdistances[passengercount] = total_distance;
+          Serial.println("write data into block");
         }
         else{
           float distance_travelled = total_distance - passengerdistances[tempIdPosition];
           float price = distance_travelled*cost;
+          Serial.println("write empty into block");
+          Serial.println(price);
         }
         
     }
