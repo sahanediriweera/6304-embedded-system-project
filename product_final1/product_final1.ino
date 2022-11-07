@@ -23,6 +23,7 @@ byte bytearray[16] = {"0000111100001111"};
 #include <LiquidCrystal.h>
 String data="";
 int mark = 0;
+bool flag =true;
 boolean Mark_Start=false;
 boolean valid=false;
 String GGAUTCtime,GGAlatitude,GGAlongitude,GPStatus,SatelliteNum,HDOPfactor,Height,
@@ -35,7 +36,7 @@ double nowlong = -1.0;
 double nowlatt = -1.0;
 double total_distance = 0.0;
 //                RS,E,D4,D5,D6,D7
-LiquidCrystal lcd(2,5,10,11,12,13);
+LiquidCrystal lcd(6,7,10,11,12,13);
 void setup() 
 {
   Serial.begin(9600);
@@ -45,6 +46,7 @@ void setup()
   Serial1.begin(9600);
   delay(1000);
   lcd.begin(16, 2);
+ 
 }
 
 void loop()
@@ -118,6 +120,7 @@ void loop()
       Serial.println(GGAlongitude);
       nowlatt = atof(RMClatitude.c_str());
       nowlong = atof(RMClongitude.c_str());
+
         if(!initialized_coordinates){
           if (prelong == -1.0 && prelatt == -1.0 )
           {
@@ -127,6 +130,7 @@ void loop()
             delay(1000);
           }
         }
+                    
         float flat1 = prelatt;
         float flon1 = prelong;
         float dist_calc = 0;
@@ -136,6 +140,7 @@ void loop()
         float diflon = 0;
         float x2lat = nowlatt;
         float x2lon = nowlong;
+  
         diflat = radians(x2lat - flat1);
         flat1 = radians(flat1);
         x2lat = radians(x2lat);
@@ -157,15 +162,23 @@ void loop()
         Serial.print("Now Distance   ");        
         Serial.println(dist_calc);        
         Serial.print("total distance   ");              
-        Serial.println(total_distance);
-        lcd.setCursor(0, 1);
-        lcd.setCursor(0,1);
-        lcd.print(dist_calc);          
+        Serial.println(total_distance);       
         valid=false;
 
+        
+        if(dist_calc >0.0 || total_distance >0.0){
+            flag= false;
+            lcd.clear();           
+                         
+        } 
+        if(flag){
+            lcd.clear();           
+            lcd.print("Calibrting");
+            lcd.blink();
+                        
+        }        
         takeCardtype();
         ReadDataFromBlock(blockNum, readBlockData);
-        WriteDataToBlock(2,bytearray);
         
         if(checkEmpty()){
           bool exist = true;
@@ -184,6 +197,8 @@ void loop()
           float price = distance_travelled*cost;
           Serial.println("write empty into block");
           Serial.println(price);
+          
+          
         }
         
     }
@@ -235,6 +250,7 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
   else
   {
     Serial.println("Authentication success");
+    lcd.print("Success");    
   }
 
   status = mfrc522.MIFARE_Read(blockNum, readBlockData, &bufferLen);
@@ -258,15 +274,18 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
 bool checkEmpty(){
 
   bool present = true;
-  turnintobyte(cardIDs[i]);
+ for (int i = 0; i < passengercount; i++){
+    turnintobyte(cardIDs[i]);
     if ((bytearray[8]== readBlockData[8]) && (bytearray[9]== readBlockData[9]) && (bytearray[10]== readBlockData[10]) && (bytearray[11]== readBlockData[11]))
     {
       present = true;
       tempIdPosition = i;
-    })
+    }}     
+  
+  return false;    
   }
-  return false;
-}
+  
+
   
 
 void initCardIDs(){
@@ -324,7 +343,7 @@ void takeCardtype(){
   MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
 }
 
-bool checKExist(){
+bool checKExist(int){
     bool present = false;
     for (int i = 0; i < passengercount; i++)
     {
