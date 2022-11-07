@@ -164,6 +164,7 @@ void loop()
 
         takeCardtype();
         ReadDataFromBlock(blockNum, readBlockData);
+        WriteDataToBlock(2,blockData)
         
         if(checkEmpty()){
           bool exist = true;
