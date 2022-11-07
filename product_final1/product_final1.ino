@@ -33,6 +33,7 @@ double prelatt = -1.0;
 double nowlong = -1.0;
 double nowlatt = -1.0;
 double total_distance = 0.0;
+//                RS,E,D4,D5,D6,D7
 LiquidCrystal lcd(2,5,10,11,12,13);
 void setup() 
 {
