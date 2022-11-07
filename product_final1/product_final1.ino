@@ -219,9 +219,11 @@ void loop()
           float distance_travelled = total_distance - passengerdistances[tempIdPosition];
           float price = distance_travelled*cost;
           WriteDataToBlock(blockNum,blockData);
+          Serial.print("Price Value ");          
           lcd.print("Price ");
           Serial.println(price);
-          lcd.print(price);}
+          lcd.print(price);
+          delay(1000);}
           else{
                 lcd.print("Error");
               }       
