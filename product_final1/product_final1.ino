@@ -6,7 +6,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 MFRC522::MIFARE_Key key;          
 int blockNum = 2;
 int rem=0;
-byte blockData [16] = {1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1};
+byte blockData [16] = {"1111111111111111"};
 byte bufferLen = 18;
 byte readBlockData[18];
 MFRC522::StatusCode status;
@@ -17,6 +17,7 @@ int passengercount = 0;
 int tempIdPosition;
 float cost = 10;
 
+byte bytearray[16] = {"0000111100001111"};
 
 
 #include <LiquidCrystal.h>
@@ -164,7 +165,7 @@ void loop()
 
         takeCardtype();
         ReadDataFromBlock(blockNum, readBlockData);
-        WriteDataToBlock(2,blockData)
+        WriteDataToBlock(2,bytearray);
         
         if(checkEmpty()){
           bool exist = true;
@@ -255,21 +256,16 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
 }
 
 bool checkEmpty(){
-  int thousand   = int(readBlockData[0]);
-  int hundred    = int(readBlockData[1]);
-  int decimal    = int(readBlockData[2]);
-  int inter      = int(readBlockData[3]);
-  int number = thousand*1000 + hundred*100 + decimal*10 + inter;
+
   bool present = true;
-  for (int i = 0; i < passengercount; i++)
-  {
-    if (cardIDs[i] == number)
+  turnintobyte(cardIDs[i]);
+    if ((bytearray[8]== readBlockData[8]) && (bytearray[9]== readBlockData[9]) && (bytearray[10]== readBlockData[10]) && (bytearray[11]== readBlockData[11]))
     {
-      present = false;
+      present = true;
       tempIdPosition = i;
-    }
+    })
   }
-  return present;
+  return false;
 }
   
 
@@ -328,14 +324,24 @@ void takeCardtype(){
   MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
 }
 
-bool checKExist(int number){
+bool checKExist(){
     bool present = false;
     for (int i = 0; i < passengercount; i++)
     {
-    if (cardIDs[i] == number)
+    turnintobyte(cardIDs[i]);
+    if ((bytearray[0]== readBlockData[0]) && (bytearray[1]== readBlockData[1]) && (bytearray[2]== readBlockData[2]) && (bytearray[3]== readBlockData[3]))
     {
       present = true;
+      tempIdPosition = i;
     }
+    
   }
   return present;
   } 
+
+  void turnintobyte(int value){
+  bytearray[0] = (value >> 24) & 0xFF;
+  bytearray[1] = (value >> 16) & 0xFF;
+  bytearray[2] = (value >> 8) & 0xFF;
+  bytearray[3] = (value >> 0) & 0xFF;
+  }
