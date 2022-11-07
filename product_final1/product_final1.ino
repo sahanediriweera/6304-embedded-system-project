@@ -190,15 +190,13 @@ void loop()
           }
           cardIDs[++passengercount] = num;
           passengerdistances[passengercount] = total_distance;
-          Serial.println("write data into block");
+          WriteDataToBlock(blockNum,bytearray);
         }
         else{
           float distance_travelled = total_distance - passengerdistances[tempIdPosition];
           float price = distance_travelled*cost;
-          Serial.println("write empty into block");
-          Serial.println(price);
-          
-          
+          WriteDataToBlock(blockNum,blockData);
+          Serial.println(price);       
         }
         
     }
@@ -274,15 +272,12 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
 bool checkEmpty(){
 
   bool present = true;
- for (int i = 0; i < passengercount; i++){
     turnintobyte(cardIDs[i]);
     if ((bytearray[8]== readBlockData[8]) && (bytearray[9]== readBlockData[9]) && (bytearray[10]== readBlockData[10]) && (bytearray[11]== readBlockData[11]))
     {
       present = true;
-      tempIdPosition = i;
-    }}     
-  
-  return false;    
+    }    
+  return present;    
   }
   
 
@@ -363,4 +358,4 @@ bool checKExist(int){
   bytearray[1] = (value >> 16) & 0xFF;
   bytearray[2] = (value >> 8) & 0xFF;
   bytearray[3] = (value >> 0) & 0xFF;
-  }
+}
