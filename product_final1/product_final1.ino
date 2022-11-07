@@ -177,22 +177,36 @@ void loop()
             lcd.blink();
                         
         }        
-        takeCardtype();
+        for (byte i = 0; i < 6; i++)
+        {
+          key.keyByte[i] = 0xFF;
+        }
+        if ( ! mfrc522.PICC_IsNewCardPresent())
+        {
+          return;
+        }
+        if ( ! mfrc522.PICC_ReadCardSerial()) 
+        {
+    
+        return;
+        }
+        MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
         ReadDataFromBlock(blockNum, readBlockData);
-        
-        if(checkEmpty()){
-          bool exist = true;
-          int num;
-          while (exist)
-          {
-            num = generateRandomNumber();
-            exist = checKExist(num);
-            Serial.print("nkn");
-          }
-          cardIDs[++passengercount] = num;
-          passengerdistances[passengercount] = total_distance;
-          WriteDataToBlock(blockNum,bytearray);
-          lcd.print("Writing data values");
+        if (mfrc522.PICC_IsNewCardPresent())
+        {
+            if(checkEmpty()){
+            bool exist = true;
+            int num;
+            while (exist)
+            {
+              num = generateRandomNumber();
+              exist = checKExist(num);
+              Serial.print("nkn");
+            }
+            cardIDs[++passengercount] = num;
+            passengerdistances[passengercount] = total_distance;
+            WriteDataToBlock(blockNum,bytearray);
+            lcd.print("Writing data values");
         }
         else{
           lcd.print("Used Card Detected");
@@ -202,7 +216,10 @@ void loop()
           lcd.print("Price ");
           Serial.println(price);
           lcd.print(price);       
+          }
         }
+        
+
         
     }
     if(Serial1.find("$")){
@@ -329,20 +346,7 @@ String reader(){
 }
 
 void takeCardtype(){
-    for (byte i = 0; i < 6; i++)
-  {
-    key.keyByte[i] = 0xFF;
-  }
-  if ( ! mfrc522.PICC_IsNewCardPresent())
-  {
-    return;
-  }
-  if ( ! mfrc522.PICC_ReadCardSerial()) 
-  {
-    
-    return;
-  }
-  MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+
 }
 
 bool checKExist(int){
