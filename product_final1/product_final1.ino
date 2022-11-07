@@ -6,7 +6,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 MFRC522::MIFARE_Key key;          
 int blockNum = 2;
 int rem=0;
-byte blockData [16] = {1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1};
+byte blockData [16] = {"1101111111111111"};
 byte bufferLen = 18;
 byte readBlockData[18];
 MFRC522::StatusCode status;
@@ -164,7 +164,7 @@ void loop()
 
         takeCardtype();
         ReadDataFromBlock(blockNum, readBlockData);
-        WriteDataToBlock(2,blockData)
+        WriteDataToBlock(2,blockData);
         
         if(checkEmpty()){
           bool exist = true;
