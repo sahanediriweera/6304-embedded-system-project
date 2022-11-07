@@ -158,6 +158,10 @@ void loop()
         total_distance += dist_calc;
         prelong = nowlong;
         prelatt = nowlatt;
+        }
+        if(dist_calc>2000.0){
+          prelong = nowlong;
+          prelatt = nowlatt;
         }        
         Serial.print("Now Distance   ");        
         Serial.println(dist_calc);        
@@ -219,7 +223,8 @@ void loop()
           Serial.println(price);
           lcd.print(price);}
           else{
-lcd.print("Error");                      }       
+                lcd.print("Error");
+              }       
           }
         }
         
