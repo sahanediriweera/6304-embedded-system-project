@@ -193,7 +193,7 @@ void loop()
         }
         MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
         ReadDataFromBlock(blockNum, readBlockData);
-Serial.print("Data :");
+        Serial.print("Data :");
         Serial.println(readBlockData[0]);                
         if (mfrc522.PICC_IsNewCardPresent())
         {
@@ -209,20 +209,29 @@ Serial.print("Data :");
             tempIdPosition = 4;
           }
 
-Serial.print("Temp Id Position  ");
-Serial.println(tempIdPosition);          
+          Serial.print("Temp Id Position  ");
+          Serial.println(tempIdPosition);          
           if((tempIdPosition == 0) || (tempIdPosition == 1) || (tempIdPosition == 2) || (tempIdPosition == 3) ){
             if(passengerdistances[tempIdPosition]==-1){
               passengerdistances[tempIdPosition] = total_distance;
               Serial.println("Card Accepted");
-              delay(5000);              
+              lcd.clear();
+              lcd.print("Enter to the Bus");
+              delay(5000);
+              lcd.clear();              
             }
             else{
               float price = cost*(total_distance-passengerdistances[tempIdPosition]);
               passengerdistances[tempIdPosition] = -1.0;
               Serial.print("Price .............");
               Serial.println(price);
-              delay(5000);
+              lcd.print("Total Amount:Rs."); 
+              lcd.print(price);             
+              delay(7000);
+              lcd.clear();
+              lcd.print("Exit from the Bus");
+              delay(5000); 
+              lcd.clear();                                         
               }
           }                             
         }
@@ -279,8 +288,10 @@ void ReadDataFromBlock(int blockNum, byte readBlockData[])
   else
   {
     Serial.println("Authentication success");
-    lcd.print("Success");
-    delay(500);    
+    lcd.print("Successfull");
+    delay(500);  
+    lcd.clear();
+           
   }
 
   status = mfrc522.MIFARE_Read(blockNum, readBlockData, &bufferLen);
