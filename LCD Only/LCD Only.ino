@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 
 // initialize the library by associating any needed LCD interface pin
-LiquidCrystal lcd(6,5,13,10,11,12);
+LiquidCrystal lcd(5,6,7,10,11,12);
 
   int x= 0;
 void setup() {

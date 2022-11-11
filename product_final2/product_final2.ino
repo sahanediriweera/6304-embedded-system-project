@@ -46,7 +46,7 @@ void setup()
   Serial1.begin(9600);
   delay(1000);
   lcd.begin(16, 2);
- 
+  lcd.print("Hi");
 }
 
 void loop()
@@ -162,7 +162,9 @@ void loop()
         if(dist_calc>2000.0){
           prelong = nowlong;
           prelatt = nowlatt;
-        }        
+        }
+        lcd.setCursor(0,1);
+        lcd.print(total_distance);        
         Serial.print("Now Distance   ");        
         Serial.println(dist_calc);        
         Serial.print("total distance   ");              
@@ -177,7 +179,7 @@ void loop()
         } 
         if(flag){
             lcd.clear();           
-            lcd.print("Calibrting");
+            lcd.print("Calibrating");
             lcd.blink();
                         
         }        
@@ -193,7 +195,7 @@ void loop()
         }
         MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
         ReadDataFromBlock(blockNum, readBlockData);
-Serial.print("Data :");
+        Serial.print("Data :");
         Serial.println(readBlockData[0]);                
         if (mfrc522.PICC_IsNewCardPresent())
         {
@@ -215,6 +217,8 @@ Serial.println(tempIdPosition);
             if(passengerdistances[tempIdPosition]==-1){
               passengerdistances[tempIdPosition] = total_distance;
               Serial.println("Card Accepted");
+                            
+lcd.println("Card Accepted");
               delay(5000);              
             }
             else{
@@ -222,6 +226,8 @@ Serial.println(tempIdPosition);
               passengerdistances[tempIdPosition] = -1.0;
               Serial.print("Price .............");
               Serial.println(price);
+              lcd.println(price);
+                          
               delay(5000);
               }
           }                             
