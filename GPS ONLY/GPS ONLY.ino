@@ -4,7 +4,6 @@
 const int RXPin = 3, TXPin = 4;
 const uint32_t GPSBaud = 9600; //Default baud of NEO-6M is 9600
 
-
 TinyGPSPlus gps; // the TinyGPS++ object
 SoftwareSerial gpsSerial(RXPin, TXPin); // the serial interface to the GPS device
 
